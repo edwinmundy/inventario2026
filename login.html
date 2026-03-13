@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -73,28 +72,6 @@
             display: none;
             text-align: center;
         }
-        .login-info {
-            text-align: center;
-            margin-top: 20px;
-            color: #64748b;
-            font-size: 0.9rem;
-            background: #f1f5f9;
-            padding: 16px;
-            border-radius: 8px;
-        }
-        .login-info strong {
-            color: #1e293b;
-        }
-        .auto-init-badge {
-            background: #10b981;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 12px;
-        }
     </style>
 </head>
 <body>
@@ -113,119 +90,35 @@
             <form class="login-form" onsubmit="iniciarSesion(event)" autocomplete="off">
                 <div class="form-group">
                     <input type="text" id="login-codigo" placeholder="Código de cajero" 
-                           required autofocus autocomplete="off" value="ADMIN">
+                           required autofocus autocomplete="off">
                 </div>
                 <div class="form-group">
                     <input type="password" id="login-password" placeholder="Contraseña" 
-                           required autocomplete="off" value="637177">
+                           required autocomplete="off">
                 </div>
                 <button type="submit" class="login-btn">🔐 Iniciar Sesión</button>
             </form>
-            
-            <div class="login-info">
-                <p>✅ <strong>Sistema auto-inicializado</strong></p>
-                <p>Usuario: <strong>ADMIN</strong></p>
-                <p>Contraseña: <strong>637177</strong></p>
-                <span class="auto-init-badge">🚀 Listo para usar</span>
-            </div>
         </div>
     </div>
 
     <script src="js/app.js"></script>
     <script>
-        // 🎯 INICIALIZACIÓN AUTOMÁTICA PARA GITHUB PAGES
-        // Se ejecuta SIEMPRE al cargar la página para garantizar que el admin exista
-        
-        function inicializarSistemaCompleto() {
-            console.log('🔧 Inicializando sistema para GitHub Pages...');
-            
-            // 1. FORZAR inicialización de datos base
-            const CATEGORIAS_DEFAULT = [
-                { id: 'sa', nombre: 'Categoría SA', icono: '🌭', descripcion: 'Completería', protegida: false },
-                { id: 'panaderia', nombre: 'Panadería', icono: '🥖', descripcion: 'Productos de panadería', protegida: false }
-            ];
-            
-            const DATOS_DEFAULT = {
-                sa: [
-                    { id: 'sa-1', nombre: 'Pan de Completo', cantidad: 50, unidad: 'unidades', minimo: 20 },
-                    { id: 'sa-2', nombre: 'Vienesas', cantidad: 100, unidad: 'unidades', minimo: 30 },
-                    { id: 'sa-3', nombre: 'Tomate', cantidad: 5, unidad: 'kg', minimo: 2 },
-                    { id: 'sa-4', nombre: 'Palta', cantidad: 10, unidad: 'unidades', minimo: 5 },
-                    { id: 'sa-5', nombre: 'Mayonesa', cantidad: 3, unidad: 'litros', minimo: 1 }
-                ],
-                panaderia: [
-                    { id: 'pan-1', nombre: 'Muffin', cantidad: 24, unidad: 'unidades', minimo: 12 },
-                    { id: 'pan-2', nombre: 'Marraqueta', cantidad: 30, unidad: 'unidades', minimo: 15 },
-                    { id: 'pan-3', nombre: 'Hallullas', cantidad: 40, unidad: 'unidades', minimo: 20 },
-                    { id: 'pan-4', nombre: 'Dobladitas', cantidad: 25, unidad: 'unidades', minimo: 10 },
-                    { id: 'pan-5', nombre: 'Ciabatta', cantidad: 15, unidad: 'unidades', minimo: 8 }
-                ],
-                cajeros: [
-                    { 
-                        id: 'admin-1', 
-                        nombre: 'Administrador', 
-                        rut: '0.000.000-0', 
-                        turno: 'ADMIN', 
-                        codigo: 'ADMIN', 
-                        password: '637177',  // ← Tu contraseña
-                        cargo: 'Corporativo',
-                        activo: true 
-                    }
-                ],
-                auditoria: [],
-                sesion: null
-            };
-            
-            // Guardar categorías
-            localStorage.setItem('inventario_categorias', JSON.stringify(CATEGORIAS_DEFAULT));
-            
-            // Guardar datos de cada categoría
-            CATEGORIAS_DEFAULT.forEach(cat => {
-                const key = `inventario_${cat.id}`;
-                if (DATOS_DEFAULT[cat.id]) {
-                    localStorage.setItem(key, JSON.stringify(DATOS_DEFAULT[cat.id]));
-                }
-            });
-            
-            // 🎯 SIEMPRE recrear el admin (sobreescribir si existe)
-            localStorage.setItem('inventario_cajeros', JSON.stringify(DATOS_DEFAULT.cajeros));
-            
-            // Inicializar auditoría vacía
-            localStorage.setItem('inventario_auditoria', JSON.stringify([]));
-            
-            console.log('✅ Sistema inicializado. Admin: ADMIN / 637177');
-        }
-        
-        // Ejecutar inmediatamente
-        inicializarSistemaCompleto();
-        
-        // También ejecutar cuando el DOM esté listo (por si acaso)
         document.addEventListener('DOMContentLoaded', () => {
-            // Verificar que todo esté correcto
-            const cajeros = localStorage.getItem('inventario_cajeros');
-            if (!cajeros) {
-                console.log('⚠️ Re-inicializando por seguridad...');
-                inicializarSistemaCompleto();
+            // Solo inicializar datos si es primera vez (sin datos de ejemplo visibles)
+            if (!localStorage.getItem('inventario_cajeros')) {
+                inicializarDatos();
             }
             
-            // Pre-llenar campos
-            document.getElementById('login-codigo').value = 'ADMIN';
-            document.getElementById('login-password').value = '637177';
-            
-            // Si hay sesión activa válida, redirigir
+            // Si ya hay sesión activa, redirigir a index
             const sesion = localStorage.getItem('inventario_sesion');
             if (sesion) {
-                try {
-                    const datos = JSON.parse(sesion);
-                    const ahora = new Date().getTime();
-                    const expiracion = 8 * 60 * 60 * 1000; // 8 horas
-                    
-                    if (ahora - datos.inicio < expiracion) {
-                        window.location.href = 'index.html';
-                    } else {
-                        localStorage.removeItem('inventario_sesion');
-                    }
-                } catch(e) {
+                const datos = JSON.parse(sesion);
+                const ahora = new Date().getTime();
+                const expiracion = 8 * 60 * 60 * 1000;
+                
+                if (ahora - datos.inicio < expiracion) {
+                    window.location.href = 'index.html';
+                } else {
                     localStorage.removeItem('inventario_sesion');
                 }
             }
